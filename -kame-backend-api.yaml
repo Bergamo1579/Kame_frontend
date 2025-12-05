@@ -1,0 +1,5363 @@
+openapi: 3.0.0
+paths:
+  /api/admin-access/access-levels:
+    post:
+      operationId: AdminAccessController_createAccessLevel
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAccessLevelDto"
+      responses:
+        "201":
+          description: Nível de acesso criado com sucesso
+        "401":
+          description: X-API-KEY inválido ou não fornecido
+        "409":
+          description: Nível de acesso já existe
+      security:
+        - X-API-KEY: []
+      summary: Criar novo nível de acesso
+      tags:
+        - Admin Access
+    get:
+      operationId: AdminAccessController_getAllAccessLevels
+      parameters: []
+      responses:
+        "200":
+          description: Lista de níveis de acesso
+        "401":
+          description: X-API-KEY inválido ou não fornecido
+      security:
+        - X-API-KEY: []
+      summary: Listar todos os níveis de acesso
+      tags:
+        - Admin Access
+  /api/admin-access/access-levels/{id}:
+    get:
+      operationId: AdminAccessController_getAccessLevelById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do nível de acesso
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Nível de acesso encontrado
+        "401":
+          description: X-API-KEY inválido ou não fornecido
+        "404":
+          description: Nível de acesso não encontrado
+      security:
+        - X-API-KEY: []
+      summary: Buscar nível de acesso por ID
+      tags:
+        - Admin Access
+    delete:
+      operationId: AdminAccessController_deleteAccessLevel
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do nível de acesso
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Nível de acesso deletado com sucesso
+        "400":
+          description: Nível de acesso possui usuários associados
+        "401":
+          description: X-API-KEY inválido ou não fornecido
+        "404":
+          description: Nível de acesso não encontrado
+      security:
+        - X-API-KEY: []
+      summary: Deletar nível de acesso
+      tags:
+        - Admin Access
+  /api/admin-access/users:
+    post:
+      operationId: AdminAccessController_createUser
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserDto"
+      responses:
+        "201":
+          description: Usuário criado com sucesso
+        "401":
+          description: X-API-KEY inválido ou não fornecido
+        "404":
+          description: Nível de acesso não encontrado
+        "409":
+          description: Usuário já existe
+      security:
+        - X-API-KEY: []
+      summary: Criar novo usuário com nível de acesso
+      tags:
+        - Admin Access
+    get:
+      operationId: AdminAccessController_getAllUsers
+      parameters: []
+      responses:
+        "200":
+          description: Lista de usuários
+        "401":
+          description: X-API-KEY inválido ou não fornecido
+      security:
+        - X-API-KEY: []
+      summary: Listar todos os usuários com seus níveis de acesso
+      tags:
+        - Admin Access
+  /api/admin-access/users/{id}:
+    get:
+      operationId: AdminAccessController_getUserById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do usuário
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Usuário encontrado
+        "401":
+          description: X-API-KEY inválido ou não fornecido
+        "404":
+          description: Usuário não encontrado
+      security:
+        - X-API-KEY: []
+      summary: Buscar usuário por ID com nível de acesso
+      tags:
+        - Admin Access
+    patch:
+      operationId: AdminAccessController_updateUser
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do usuário
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserDto"
+      responses:
+        "200":
+          description: Usuário atualizado com sucesso
+        "401":
+          description: X-API-KEY inválido ou não fornecido
+        "404":
+          description: Usuário ou nível de acesso não encontrado
+        "409":
+          description: Username já existe
+      security:
+        - X-API-KEY: []
+      summary: Atualizar usuário (incluindo nível de acesso)
+      tags:
+        - Admin Access
+    delete:
+      operationId: AdminAccessController_deleteUser
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do usuário
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Usuário deletado com sucesso
+        "401":
+          description: X-API-KEY inválido ou não fornecido
+        "404":
+          description: Usuário não encontrado
+      security:
+        - X-API-KEY: []
+      summary: Deletar usuário (soft delete)
+      tags:
+        - Admin Access
+  /api/auth/login:
+    post:
+      description: Autentica um usuário e retorna um token JWT válido por 24 horas
+      operationId: AuthController_login
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDto"
+      responses:
+        "200":
+          description: Login realizado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  user:
+                    employee_id: 550e8400-e29b-41d4-a716-446655440000
+                    name: João Silva
+                    email: joao@example.com
+                    access_level:
+                      access_level_id: 1
+                      name: Admin
+                      description: Administrador do sistema
+        "401":
+          description: Credenciais inválidas
+        "404":
+          description: Usuário não encontrado
+      summary: Login de usuário
+      tags:
+        - Auth
+  /api/auth/profile:
+    get:
+      description: Retorna as informações do usuário autenticado através do token JWT
+      operationId: AuthController_getProfile
+      parameters: []
+      responses:
+        "200":
+          description: Perfil do usuário
+          content:
+            application/json:
+              schema:
+                example:
+                  employee_id: 550e8400-e29b-41d4-a716-446655440000
+                  name: João Silva
+                  email: joao@example.com
+                  access_level:
+                    access_level_id: 1
+                    name: Admin
+                    description: Administrador do sistema
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+      security:
+        - JWT-auth: []
+      summary: Obter perfil do usuário logado
+      tags:
+        - Auth
+  /api/status-general:
+    post:
+      description: Cria um novo status que pode ser usado por clientes, fornecedores, etc.
+      operationId: StatusGeneralController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStatusGeneralDto"
+      responses:
+        "201":
+          description: Status criado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  status_id: 1
+                  name_status: Ativo
+                  description: Status para indicar que o item está ativo
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "409":
+          description: Já existe um status com este nome
+      security:
+        - JWT-auth: []
+      summary: Criar novo status geral
+      tags:
+        - Status Geral
+    get:
+      description: Retorna uma lista com todos os status cadastrados no sistema
+      operationId: StatusGeneralController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: Lista de status
+          content:
+            application/json:
+              schema:
+                example:
+                  - status_id: 1
+                    name_status: Ativo
+                    description: Status para indicar que o item está ativo
+                  - status_id: 2
+                    name_status: Inativo
+                    description: Status para indicar que o item está inativo
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar todos os status gerais
+      tags:
+        - Status Geral
+  /api/status-general/{id}:
+    get:
+      description: Retorna os detalhes de um status específico
+      operationId: StatusGeneralController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do status
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Status encontrado
+          content:
+            application/json:
+              schema:
+                example:
+                  status_id: 1
+                  name_status: Ativo
+                  description: Status para indicar que o item está ativo
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Status não encontrado
+      security:
+        - JWT-auth: []
+      summary: Buscar status por ID
+      tags:
+        - Status Geral
+    patch:
+      description: Atualiza os dados de um status existente
+      operationId: StatusGeneralController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do status
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStatusGeneralDto"
+      responses:
+        "200":
+          description: Status atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  status_id: 1
+                  name_status: Ativo
+                  description: Status atualizado para indicar que o item está ativo
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Status não encontrado
+        "409":
+          description: Já existe um status com este nome
+      security:
+        - JWT-auth: []
+      summary: Atualizar status
+      tags:
+        - Status Geral
+    delete:
+      description: Remove um status do sistema
+      operationId: StatusGeneralController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do status
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Status deletado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Status deletado com sucesso
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Status não encontrado
+      security:
+        - JWT-auth: []
+      summary: Deletar status
+      tags:
+        - Status Geral
+  /api/segments:
+    post:
+      description: Cria um novo segmento de mercado
+      operationId: SegmentsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSegmentDto"
+      responses:
+        "201":
+          description: Segmento criado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  segment_id: 1
+                  name_segment: Varejo
+                  description: Segmento de lojas de varejo
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "409":
+          description: Já existe um segmento com este nome
+      security:
+        - JWT-auth: []
+      summary: Criar novo segmento
+      tags:
+        - Segmentos
+    get:
+      description: Retorna uma lista com todos os segmentos cadastrados
+      operationId: SegmentsController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: Lista de segmentos
+          content:
+            application/json:
+              schema:
+                example:
+                  - segment_id: 1
+                    name_segment: Varejo
+                    description: Segmento de lojas de varejo
+                  - segment_id: 2
+                    name_segment: Atacado
+                    description: Segmento de lojas de atacado
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar todos os segmentos
+      tags:
+        - Segmentos
+  /api/segments/{id}:
+    get:
+      description: Retorna os detalhes de um segmento específico
+      operationId: SegmentsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do segmento
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Segmento encontrado
+          content:
+            application/json:
+              schema:
+                example:
+                  segment_id: 1
+                  name_segment: Varejo
+                  description: Segmento de lojas de varejo
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Segmento não encontrado
+      security:
+        - JWT-auth: []
+      summary: Buscar segmento por ID
+      tags:
+        - Segmentos
+    patch:
+      description: Atualiza os dados de um segmento existente
+      operationId: SegmentsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do segmento
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSegmentDto"
+      responses:
+        "200":
+          description: Segmento atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  segment_id: 1
+                  name_segment: Varejo
+                  description: Segmento atualizado de lojas de varejo
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Segmento não encontrado
+        "409":
+          description: Já existe um segmento com este nome
+      security:
+        - JWT-auth: []
+      summary: Atualizar segmento
+      tags:
+        - Segmentos
+    delete:
+      description: Remove um segmento do sistema
+      operationId: SegmentsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do segmento
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Segmento deletado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Segmento deletado com sucesso
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Segmento não encontrado
+      security:
+        - JWT-auth: []
+      summary: Deletar segmento
+      tags:
+        - Segmentos
+  /api/clients:
+    post:
+      description: Cria um novo cliente vinculado a um status e segmento
+      operationId: ClientsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateClientDto"
+      responses:
+        "201":
+          description: Cliente criado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  client_id: 550e8400-e29b-41d4-a716-446655440000
+                  name_client: João Silva Comércio LTDA
+                  email: contato@joaosilva.com.br
+                  phone: (11) 98765-4321
+                  address: Rua das Flores, 123 - Centro - São Paulo/SP
+                  CPF_CNPJ: 12.345.678/0001-90
+                  name_responsible: João Silva
+                  corporate_name: João Silva Comércio de Produtos Alimentícios LTDA
+                  status_id: 1
+                  segment_id: 1
+                  status:
+                    status_id: 1
+                    name_status: Ativo
+                    description: Cliente ativo
+                  segment:
+                    segment_id: 1
+                    name_segment: Varejo
+                    description: Segmento de varejo
+        "400":
+          description: Status ou Segmento não encontrado
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "409":
+          description: Já existe um cliente com este CPF/CNPJ
+      security:
+        - JWT-auth: []
+      summary: Criar novo cliente
+      tags:
+        - Clientes
+    get:
+      description: "Retorna uma lista com todos os clientes cadastrados. Permite
+        filtrar por múltiplos critérios via query params (busca parcial para
+        nome, CPF/CNPJ e telefone). Exemplos: GET /clients | GET
+        /clients?status_id=1 | GET /clients?name=João | GET
+        /clients?cpf_cnpj=123456 | GET /clients?phone=98765 | GET
+        /clients?status_id=1&name=Silva&cpf_cnpj=00190"
+      operationId: ClientsController_findAll
+      parameters:
+        - name: status_id
+          required: false
+          in: query
+          schema:
+            type: number
+        - name: segment_id
+          required: false
+          in: query
+          schema:
+            type: number
+        - name: name
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: cpf_cnpj
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: phone
+          required: false
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de clientes (filtrada ou completa)
+          content:
+            application/json:
+              schema:
+                example:
+                  - client_id: 550e8400-e29b-41d4-a716-446655440000
+                    name_client: João Silva Comércio LTDA
+                    email: contato@joaosilva.com.br
+                    phone: (11) 98765-4321
+                    CPF_CNPJ: 12.345.678/0001-90
+                    status:
+                      status_id: 1
+                      name_status: Ativo
+                    segment:
+                      segment_id: 1
+                      name_segment: Varejo
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar todos os clientes
+      tags:
+        - Clientes
+  /api/clients/{id}:
+    get:
+      description: Retorna os detalhes completos de um cliente específico
+      operationId: ClientsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do cliente
+          schema:
+            example: 550e8400-e29b-41d4-a716-446655440000
+            type: string
+      responses:
+        "200":
+          description: Cliente encontrado
+          content:
+            application/json:
+              schema:
+                example:
+                  client_id: 550e8400-e29b-41d4-a716-446655440000
+                  name_client: João Silva Comércio LTDA
+                  email: contato@joaosilva.com.br
+                  phone: (11) 98765-4321
+                  address: Rua das Flores, 123
+                  CPF_CNPJ: 12.345.678/0001-90
+                  name_responsible: João Silva
+                  corporate_name: João Silva Comércio LTDA
+                  status:
+                    status_id: 1
+                    name_status: Ativo
+                  segment:
+                    segment_id: 1
+                    name_segment: Varejo
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Cliente não encontrado
+      security:
+        - JWT-auth: []
+      summary: Buscar cliente por ID
+      tags:
+        - Clientes
+    patch:
+      description: Atualiza os dados de um cliente existente
+      operationId: ClientsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do cliente
+          schema:
+            example: 550e8400-e29b-41d4-a716-446655440000
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateClientDto"
+      responses:
+        "200":
+          description: Cliente atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  client_id: 550e8400-e29b-41d4-a716-446655440000
+                  name_client: João Silva Comércio LTDA
+                  email: novo@joaosilva.com.br
+                  status_id: 2
+                  segment_id: 2
+        "400":
+          description: Status ou Segmento não encontrado
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Cliente não encontrado
+        "409":
+          description: Já existe um cliente com este CPF/CNPJ
+      security:
+        - JWT-auth: []
+      summary: Atualizar cliente
+      tags:
+        - Clientes
+    delete:
+      description: Remove um cliente do sistema
+      operationId: ClientsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do cliente
+          schema:
+            example: 550e8400-e29b-41d4-a716-446655440000
+            type: string
+      responses:
+        "200":
+          description: Cliente deletado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Cliente deletado com sucesso
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Cliente não encontrado
+      security:
+        - JWT-auth: []
+      summary: Deletar cliente
+      tags:
+        - Clientes
+  /api/roles:
+    post:
+      description: Cria um novo papel que pode ser atribuído a funcionários
+      operationId: RolesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRoleDto"
+      responses:
+        "201":
+          description: Papel criado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  role_id: 1
+                  role_name: Vendedor
+                  description: Responsável por vendas e atendimento ao cliente
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "409":
+          description: Já existe um papel com este nome
+      security:
+        - JWT-auth: []
+      summary: Criar novo papel/função
+      tags:
+        - Papéis/Funções
+    get:
+      description: Retorna uma lista com todos os papéis cadastrados
+      operationId: RolesController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: Lista de papéis
+          content:
+            application/json:
+              schema:
+                example:
+                  - role_id: 1
+                    role_name: Vendedor
+                    description: Responsável por vendas e atendimento ao cliente
+                  - role_id: 2
+                    role_name: Gerente
+                    description: Responsável por gestão da equipe
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar todos os papéis/funções
+      tags:
+        - Papéis/Funções
+  /api/roles/{id}:
+    get:
+      description: Retorna os detalhes de um papel específico
+      operationId: RolesController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do papel
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Papel encontrado
+          content:
+            application/json:
+              schema:
+                example:
+                  role_id: 1
+                  role_name: Vendedor
+                  description: Responsável por vendas e atendimento ao cliente
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Papel não encontrado
+      security:
+        - JWT-auth: []
+      summary: Buscar papel por ID
+      tags:
+        - Papéis/Funções
+    patch:
+      description: Atualiza os dados de um papel existente
+      operationId: RolesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do papel
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRoleDto"
+      responses:
+        "200":
+          description: Papel atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  role_id: 1
+                  role_name: Vendedor Senior
+                  description: Responsável por vendas e mentoria de novos vendedores
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Papel não encontrado
+        "409":
+          description: Já existe um papel com este nome
+      security:
+        - JWT-auth: []
+      summary: Atualizar papel
+      tags:
+        - Papéis/Funções
+    delete:
+      description: Remove um papel do sistema
+      operationId: RolesController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do papel
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Papel deletado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Papel deletado com sucesso
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Papel não encontrado
+      security:
+        - JWT-auth: []
+      summary: Deletar papel
+      tags:
+        - Papéis/Funções
+  /api/employees:
+    post:
+      description: Cria um novo funcionário vinculado a um papel/função
+      operationId: EmployeesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEmployeeDto"
+      responses:
+        "201":
+          description: Funcionário criado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  employee_id: 550e8400-e29b-41d4-a716-446655440000
+                  name: João Silva
+                  role_id: 1
+                  email: joao.silva@empresa.com
+                  address: Rua das Flores, 123 - Centro
+                  CPF: "12345678900"
+                  salary: 3500
+                  role:
+                    role_id: 1
+                    role_name: Vendedor
+                    description: Responsável por vendas
+        "400":
+          description: Papel/função não encontrado
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "409":
+          description: Já existe um funcionário com este CPF ou email
+      security:
+        - JWT-auth: []
+      summary: Criar novo funcionário
+      tags:
+        - Funcionários
+    get:
+      description: "Retorna uma lista com todos os funcionários cadastrados. Permite
+        filtrar por múltiplos critérios via query params (busca parcial para
+        nome e CPF). Exemplos: GET /employees | GET /employees?role_id=1 | GET
+        /employees?name=João | GET /employees?cpf=123456 | GET
+        /employees?role_id=1&name=Silva"
+      operationId: EmployeesController_findAll
+      parameters:
+        - name: role_id
+          required: false
+          in: query
+          schema:
+            type: number
+        - name: name
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: cpf
+          required: false
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de funcionários (filtrada ou completa)
+          content:
+            application/json:
+              schema:
+                example:
+                  - employee_id: 550e8400-e29b-41d4-a716-446655440000
+                    name: João Silva
+                    email: joao.silva@empresa.com
+                    CPF: "12345678900"
+                    salary: 3500
+                    role:
+                      role_id: 1
+                      role_name: Vendedor
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar todos os funcionários
+      tags:
+        - Funcionários
+  /api/employees/{id}:
+    get:
+      description: Retorna os detalhes completos de um funcionário específico
+      operationId: EmployeesController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do funcionário
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Funcionário encontrado
+          content:
+            application/json:
+              schema:
+                example:
+                  employee_id: 550e8400-e29b-41d4-a716-446655440000
+                  name: João Silva
+                  email: joao.silva@empresa.com
+                  address: Rua das Flores, 123
+                  CPF: "12345678900"
+                  salary: 3500
+                  role:
+                    role_id: 1
+                    role_name: Vendedor
+                    description: Responsável por vendas
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Funcionário não encontrado
+      security:
+        - JWT-auth: []
+      summary: Buscar funcionário por ID
+      tags:
+        - Funcionários
+    patch:
+      description: Atualiza os dados de um funcionário existente
+      operationId: EmployeesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do funcionário
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEmployeeDto"
+      responses:
+        "200":
+          description: Funcionário atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  employee_id: 550e8400-e29b-41d4-a716-446655440000
+                  name: João Silva Santos
+                  email: joao.santos@empresa.com
+                  salary: 4000
+        "400":
+          description: Papel/função não encontrado
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Funcionário não encontrado
+        "409":
+          description: Já existe um funcionário com este CPF ou email
+      security:
+        - JWT-auth: []
+      summary: Atualizar funcionário
+      tags:
+        - Funcionários
+    delete:
+      description: Remove um funcionário do sistema
+      operationId: EmployeesController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do funcionário
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Funcionário deletado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Funcionário deletado com sucesso
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Funcionário não encontrado
+      security:
+        - JWT-auth: []
+      summary: Deletar funcionário
+      tags:
+        - Funcionários
+  /api/budget-types:
+    post:
+      description: Cria um novo tipo de orçamento que pode ser usado para categorizar
+        orçamentos
+      operationId: BudgetTypesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBudgetTypeDto"
+      responses:
+        "201":
+          description: Tipo de orçamento criado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  type_id: 1
+                  name_type: Orçamento Padrão
+                  description: Modelo de orçamento padrão para serviços gerais
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "409":
+          description: Já existe um tipo de orçamento com este nome
+      security:
+        - JWT-auth: []
+      summary: Criar novo tipo de orçamento
+      tags:
+        - Tipos de Orçamento
+    get:
+      description: Retorna uma lista com todos os tipos de orçamento cadastrados
+      operationId: BudgetTypesController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: Lista de tipos de orçamento
+          content:
+            application/json:
+              schema:
+                example:
+                  - type_id: 1
+                    name_type: Orçamento Padrão
+                    description: Modelo de orçamento padrão para serviços gerais
+                  - type_id: 2
+                    name_type: Orçamento Personalizado
+                    description: Modelo de orçamento personalizado para clientes especiais
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar todos os tipos de orçamento
+      tags:
+        - Tipos de Orçamento
+  /api/budget-types/{id}:
+    get:
+      description: Retorna os detalhes de um tipo de orçamento específico
+      operationId: BudgetTypesController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Tipo de orçamento encontrado
+          content:
+            application/json:
+              schema:
+                example:
+                  type_id: 1
+                  name_type: Orçamento Padrão
+                  description: Modelo de orçamento padrão para serviços gerais
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Tipo de orçamento não encontrado
+      security:
+        - JWT-auth: []
+      summary: Buscar tipo de orçamento por ID
+      tags:
+        - Tipos de Orçamento
+    patch:
+      description: Atualiza os dados de um tipo de orçamento existente
+      operationId: BudgetTypesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBudgetTypeDto"
+      responses:
+        "200":
+          description: Tipo de orçamento atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  type_id: 1
+                  name_type: Orçamento Premium
+                  description: Modelo de orçamento premium com serviços diferenciados
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Tipo de orçamento não encontrado
+        "409":
+          description: Já existe um tipo de orçamento com este nome
+      security:
+        - JWT-auth: []
+      summary: Atualizar tipo de orçamento
+      tags:
+        - Tipos de Orçamento
+    delete:
+      description: Remove um tipo de orçamento do sistema
+      operationId: BudgetTypesController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Tipo de orçamento deletado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Tipo de orçamento deletado com sucesso
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Tipo de orçamento não encontrado
+      security:
+        - JWT-auth: []
+      summary: Deletar tipo de orçamento
+      tags:
+        - Tipos de Orçamento
+  /api/status-budget:
+    post:
+      description: Cria um novo status que pode ser usado para rastrear o estado dos
+        orçamentos
+      operationId: StatusBudgetController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStatusBudgetDto"
+      responses:
+        "201":
+          description: Status de orçamento criado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  status_id: 1
+                  name_status: Em Análise
+                  description: Orçamento aguardando análise da equipe comercial
+                  updated_at: 2024-01-15T10:30:00.000Z
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "409":
+          description: Já existe um status de orçamento com este nome
+      security:
+        - JWT-auth: []
+      summary: Criar novo status de orçamento
+      tags:
+        - Status de Orçamento
+    get:
+      description: Retorna uma lista com todos os status de orçamento cadastrados
+      operationId: StatusBudgetController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: Lista de status de orçamento
+          content:
+            application/json:
+              schema:
+                example:
+                  - status_id: 1
+                    name_status: Em Análise
+                    description: Orçamento aguardando análise
+                    updated_at: 2024-01-15T10:30:00.000Z
+                  - status_id: 2
+                    name_status: Aprovado
+                    description: Orçamento aprovado pelo cliente
+                    updated_at: 2024-01-16T14:20:00.000Z
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar todos os status de orçamento
+      tags:
+        - Status de Orçamento
+  /api/status-budget/{id}:
+    get:
+      description: Retorna os detalhes de um status de orçamento específico
+      operationId: StatusBudgetController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Status de orçamento encontrado
+          content:
+            application/json:
+              schema:
+                example:
+                  status_id: 1
+                  name_status: Em Análise
+                  description: Orçamento aguardando análise da equipe comercial
+                  updated_at: 2024-01-15T10:30:00.000Z
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Status de orçamento não encontrado
+      security:
+        - JWT-auth: []
+      summary: Buscar status de orçamento por ID
+      tags:
+        - Status de Orçamento
+    patch:
+      description: Atualiza os dados de um status de orçamento existente. O campo
+        updated_at é atualizado automaticamente.
+      operationId: StatusBudgetController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStatusBudgetDto"
+      responses:
+        "200":
+          description: Status de orçamento atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  status_id: 1
+                  name_status: Aprovado
+                  description: Orçamento aprovado e pronto para execução
+                  updated_at: 2024-01-17T09:15:00.000Z
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Status de orçamento não encontrado
+        "409":
+          description: Já existe um status de orçamento com este nome
+      security:
+        - JWT-auth: []
+      summary: Atualizar status de orçamento
+      tags:
+        - Status de Orçamento
+    delete:
+      description: Remove um status de orçamento do sistema
+      operationId: StatusBudgetController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Status de orçamento deletado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Status de orçamento deletado com sucesso
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Status de orçamento não encontrado
+      security:
+        - JWT-auth: []
+      summary: Deletar status de orçamento
+      tags:
+        - Status de Orçamento
+  /api/budget:
+    post:
+      description: Cria um novo orçamento vinculado a cliente, status, tipo e funcionário
+      operationId: BudgetController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBudgetDto"
+      responses:
+        "201":
+          description: Orçamento criado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  budget_id: 550e8400-e29b-41d4-a716-446655440000
+                  client_id: 550e8400-e29b-41d4-a716-446655440000
+                  status_id: 1
+                  type_id: 1
+                  value: 1500
+                  employee_id: 550e8400-e29b-41d4-a716-446655440000
+                  description_budget: Orçamento para reforma elétrica
+                  date_status_update: 2024-06-01
+                  created_at: 2024-06-01T10:00:00.000Z
+                  status: pending
+                  client:
+                    client_id: ...
+                    name_client: ...
+                  statusBudget:
+                    status_id: 1
+                    name_status: Em Análise
+                  type:
+                    type_id: 1
+                    name_type: Orçamento Padrão
+                  employee:
+                    employee_id: ...
+                    name: ...
+        "400":
+          description: FK não encontrada
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Criar novo orçamento
+      tags:
+        - Orçamentos
+    get:
+      description: "Retorna uma lista com todos os orçamentos cadastrados. Permite
+        filtrar por múltiplos critérios via query params. Exemplos: GET /budget
+        | GET /budget?client_id=... | GET /budget?status_id=1 | GET
+        /budget?type_id=2 | GET /budget?employee_id=... | GET
+        /budget?status=pending"
+      operationId: BudgetController_findAll
+      parameters:
+        - name: client_id
+          required: false
+          in: query
+          description: ID do cliente
+          schema:
+            type: string
+        - name: status_id
+          required: false
+          in: query
+          description: ID do status do orçamento
+          schema:
+            type: number
+        - name: type_id
+          required: false
+          in: query
+          description: ID do tipo de orçamento
+          schema:
+            type: number
+        - name: employee_id
+          required: false
+          in: query
+          description: ID do funcionário responsável
+          schema:
+            type: string
+        - name: status
+          required: false
+          in: query
+          description: Status do orçamento
+          schema:
+            type: string
+            enum:
+              - pending
+              - approved
+              - rejected
+        - name: date_status_update
+          required: false
+          in: query
+          description: Data da última atualização de status (YYYY-MM-DD)
+          schema:
+            type: string
+        - name: offset
+          required: false
+          in: query
+          description: Pular N registros (para paginação)
+          schema:
+            type: number
+        - name: limit
+          required: false
+          in: query
+          description: Limite de registros retornados (para paginação)
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Lista de orçamentos (filtrada ou completa)
+          content:
+            application/json:
+              schema:
+                example:
+                  total: 1
+                  items:
+                    - budget_id: ...
+                      client_id: ...
+                      status_id: 1
+                      type_id: 1
+                      value: 1500
+                      employee_id: ...
+                      description_budget: ...
+                      date_status_update: 2024-06-01
+                      created_at: 2024-06-01T10:00:00.000Z
+                      status: pending
+                      client:
+                        client_id: ...
+                        name_client: ...
+                      statusBudget:
+                        status_id: 1
+                        name_status: Em Análise
+                      type:
+                        type_id: 1
+                        name_type: Orçamento Padrão
+                      employee:
+                        employee_id: ...
+                        name: ...
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar todos os orçamentos
+      tags:
+        - Orçamentos
+  /api/budget/{id}:
+    get:
+      description: Retorna os detalhes completos de um orçamento específico
+      operationId: BudgetController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do orçamento
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Orçamento encontrado
+          content:
+            application/json:
+              schema:
+                example:
+                  budget_id: ...
+                  client_id: ...
+                  status_id: 1
+                  type_id: 1
+                  value: 1500
+                  employee_id: ...
+                  description_budget: ...
+                  date_status_update: 2024-06-01
+                  created_at: 2024-06-01T10:00:00.000Z
+                  status: pending
+                  client:
+                    client_id: ...
+                    name_client: ...
+                  statusBudget:
+                    status_id: 1
+                    name_status: Em Análise
+                  type:
+                    type_id: 1
+                    name_type: Orçamento Padrão
+                  employee:
+                    employee_id: ...
+                    name: ...
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Orçamento não encontrado
+      security:
+        - JWT-auth: []
+      summary: Buscar orçamento por ID
+      tags:
+        - Orçamentos
+    patch:
+      description: Atualiza os dados de um orçamento existente
+      operationId: BudgetController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do orçamento
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBudgetDto"
+      responses:
+        "200":
+          description: Orçamento atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  budget_id: ...
+                  value: 2000
+                  status: approved
+        "400":
+          description: FK não encontrada
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Orçamento não encontrado
+      security:
+        - JWT-auth: []
+      summary: Atualizar orçamento
+      tags:
+        - Orçamentos
+    delete:
+      description: Remove um orçamento do sistema
+      operationId: BudgetController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do orçamento
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Orçamento deletado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Orçamento deletado com sucesso
+        "401":
+          description: Não autorizado - Token inválido ou ausente
+        "403":
+          description: Acesso negado
+        "404":
+          description: Orçamento não encontrado
+      security:
+        - JWT-auth: []
+      summary: Deletar orçamento
+      tags:
+        - Orçamentos
+  /api/freight:
+    post:
+      description: Cria um novo frete
+      operationId: FreightController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateFreightDto"
+      responses:
+        "201":
+          description: Frete criado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  freight_id: uuid
+                  name_freight: Frete Rodoviário
+                  description: Transporte rodoviário nacional
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "409":
+          description: Já existe um frete com este nome
+      security:
+        - JWT-auth: []
+      summary: Criar novo frete
+      tags:
+        - Fretes
+    get:
+      description: Retorna uma lista com todos os fretes cadastrados
+      operationId: FreightController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: Lista de fretes
+          content:
+            application/json:
+              schema:
+                example:
+                  - freight_id: uuid
+                    name_freight: Frete Rodoviário
+                    description: Transporte rodoviário nacional
+                  - freight_id: uuid
+                    name_freight: Frete Marítimo
+                    description: Transporte marítimo internacional
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar todos os fretes
+      tags:
+        - Fretes
+  /api/freight/{id}:
+    get:
+      description: Retorna os detalhes de um frete específico
+      operationId: FreightController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do frete
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Frete encontrado
+          content:
+            application/json:
+              schema:
+                example:
+                  freight_id: uuid
+                  name_freight: Frete Rodoviário
+                  description: Transporte rodoviário nacional
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Frete não encontrado
+      security:
+        - JWT-auth: []
+      summary: Buscar frete por ID
+      tags:
+        - Fretes
+    patch:
+      description: Atualiza os dados de um frete existente
+      operationId: FreightController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do frete
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateFreightDto"
+      responses:
+        "200":
+          description: Frete atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  freight_id: uuid
+                  name_freight: Frete Rodoviário
+                  description: Transporte rodoviário nacional
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Frete não encontrado
+        "409":
+          description: Já existe um frete com este nome
+      security:
+        - JWT-auth: []
+      summary: Atualizar frete
+      tags:
+        - Fretes
+    delete:
+      description: Remove um frete do sistema
+      operationId: FreightController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do frete
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Frete deletado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Frete deletado com sucesso
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Frete não encontrado
+      security:
+        - JWT-auth: []
+      summary: Deletar frete
+      tags:
+        - Fretes
+  /api/orders-service:
+    post:
+      description: Cria uma ordem de serviço apenas para orçamento aprovado
+      operationId: OrdersServiceController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrdersServiceDto"
+      responses:
+        "201":
+          description: Ordem de serviço criada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  os_id: uuid
+                  budget_id: uuid
+                  date: 2024-06-01
+                  description: Execução de serviço
+                  approved_by: João
+        "400":
+          description: Só é possível gerar ordem de serviço para orçamento aprovado ou FK
+            não encontrada
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Criar nova ordem de serviço
+      tags:
+        - Ordens de Serviço
+    get:
+      description: Retorna uma lista com todas as ordens de serviço cadastradas,
+        permite filtros e paginação
+      operationId: OrdersServiceController_findAll
+      parameters:
+        - name: budget_id
+          required: false
+          in: query
+          description: ID do orçamento
+          schema:
+            type: string
+        - name: freight_id
+          required: false
+          in: query
+          description: ID do frete
+          schema:
+            type: string
+        - name: status
+          required: false
+          in: query
+          description: Status da ordem de serviço
+          schema:
+            type: string
+            enum:
+              - aprovado
+              - andamento
+              - cancelado
+        - name: date
+          required: false
+          in: query
+          description: Data da ordem de serviço
+          schema:
+            type: string
+        - name: offset
+          required: false
+          in: query
+          description: "Paginação: offset"
+          schema:
+            type: number
+        - name: limit
+          required: false
+          in: query
+          description: "Paginação: limit"
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Lista de ordens de serviço
+          content:
+            application/json:
+              schema:
+                example:
+                  total: 1
+                  items:
+                    - os_id: uuid
+                      budget_id: uuid
+                      date: 2024-06-01
+                      description: Execução de serviço
+                      approved_by: João
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar todas as ordens de serviço
+      tags:
+        - Ordens de Serviço
+  /api/orders-service/{id}:
+    get:
+      description: Retorna os detalhes de uma ordem de serviço específica
+      operationId: OrdersServiceController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID da ordem de serviço
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ordem de serviço encontrada
+          content:
+            application/json:
+              schema:
+                example:
+                  os_id: uuid
+                  budget_id: uuid
+                  date: 2024-06-01
+                  description: Execução de serviço
+                  approved_by: João
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Ordem de serviço não encontrada
+      security:
+        - JWT-auth: []
+      summary: Buscar ordem de serviço por ID
+      tags:
+        - Ordens de Serviço
+    patch:
+      description: Atualiza os dados de uma ordem de serviço existente
+      operationId: OrdersServiceController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID da ordem de serviço
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateOrdersServiceDto"
+      responses:
+        "200":
+          description: Ordem de serviço atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  os_id: uuid
+                  status: em andamento
+                  moodle: true
+        "400":
+          description: FK não encontrada
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Ordem de serviço não encontrada
+      security:
+        - JWT-auth: []
+      summary: Atualizar ordem de serviço
+      tags:
+        - Ordens de Serviço
+    delete:
+      description: Remove uma ordem de serviço do sistema
+      operationId: OrdersServiceController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID da ordem de serviço
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ordem de serviço deletada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Ordem de serviço deletada com sucesso
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Ordem de serviço não encontrada
+      security:
+        - JWT-auth: []
+      summary: Deletar ordem de serviço
+      tags:
+        - Ordens de Serviço
+  /api/supplier:
+    post:
+      description: Cria um novo fornecedor com validação de CPF/CNPJ e email únicos
+      operationId: SupplierController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSupplierDto"
+      responses:
+        "201":
+          description: Fornecedor criado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  supplier_id: uuid
+                  name_supplier: Fornecedor Exemplo
+                  email: exemplo@fornecedor.com
+                  phone: (11) 99999-9999
+                  address: Rua Exemplo, 123
+                  CPF_CNPJ: "12345678000190"
+                  name_responsible: João Silva
+                  corporate_name: Fornecedor Exemplo LTDA
+                  status:
+                    status_id: 1
+                    name_status: Ativo
+                  segment:
+                    segment_id: 2
+                    name_segment: Varejo
+                  client:
+                    client_id: uuid
+                    name_client: Cliente Exemplo
+        "400":
+          description: FK não encontrada
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "409":
+          description: CPF/CNPJ ou email já cadastrado
+      security:
+        - JWT-auth: []
+      summary: Criar novo fornecedor
+      tags:
+        - Fornecedores
+    get:
+      description: Retorna uma lista de fornecedores com filtros e paginação
+      operationId: SupplierController_findAll
+      parameters:
+        - name: client_id
+          required: false
+          in: query
+          description: ID do cliente
+          schema:
+            type: string
+        - name: status_id
+          required: false
+          in: query
+          description: ID do status
+          schema:
+            type: number
+        - name: segment_id
+          required: false
+          in: query
+          description: ID do segmento
+          schema:
+            type: number
+        - name: name_supplier
+          required: false
+          in: query
+          description: Nome do fornecedor
+          schema:
+            type: string
+        - name: CPF_CNPJ
+          required: false
+          in: query
+          description: CPF ou CNPJ
+          schema:
+            type: string
+        - name: offset
+          required: false
+          in: query
+          description: "Paginação: offset"
+          schema:
+            type: number
+        - name: limit
+          required: false
+          in: query
+          description: "Paginação: limit"
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Lista de fornecedores
+          content:
+            application/json:
+              schema:
+                example:
+                  total: 1
+                  items:
+                    - supplier_id: uuid
+                      name_supplier: Fornecedor Exemplo
+                      email: exemplo@fornecedor.com
+                      phone: (11) 99999-9999
+                      address: Rua Exemplo, 123
+                      CPF_CNPJ: "12345678000190"
+                      name_responsible: João Silva
+                      corporate_name: Fornecedor Exemplo LTDA
+                      status:
+                        status_id: 1
+                        name_status: Ativo
+                      segment:
+                        segment_id: 2
+                        name_segment: Varejo
+                      client:
+                        client_id: uuid
+                        name_client: Cliente Exemplo
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar fornecedores
+      tags:
+        - Fornecedores
+  /api/supplier/{id}:
+    get:
+      description: Retorna os detalhes de um fornecedor específico
+      operationId: SupplierController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do fornecedor
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Fornecedor encontrado
+          content:
+            application/json:
+              schema:
+                example:
+                  supplier_id: uuid
+                  name_supplier: Fornecedor Exemplo
+                  email: exemplo@fornecedor.com
+                  phone: (11) 99999-9999
+                  address: Rua Exemplo, 123
+                  CPF_CNPJ: "12345678000190"
+                  name_responsible: João Silva
+                  corporate_name: Fornecedor Exemplo LTDA
+                  status:
+                    status_id: 1
+                    name_status: Ativo
+                  segment:
+                    segment_id: 2
+                    name_segment: Varejo
+                  client:
+                    client_id: uuid
+                    name_client: Cliente Exemplo
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Fornecedor não encontrado
+      security:
+        - JWT-auth: []
+      summary: Buscar fornecedor por ID
+      tags:
+        - Fornecedores
+    patch:
+      description: Atualiza os dados de um fornecedor existente
+      operationId: SupplierController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do fornecedor
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSupplierDto"
+      responses:
+        "200":
+          description: Fornecedor atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  supplier_id: uuid
+                  name_supplier: Fornecedor Atualizado
+        "400":
+          description: FK não encontrada
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Fornecedor não encontrado
+        "409":
+          description: CPF/CNPJ ou email já cadastrado
+      security:
+        - JWT-auth: []
+      summary: Atualizar fornecedor
+      tags:
+        - Fornecedores
+    delete:
+      description: Remove um fornecedor do sistema
+      operationId: SupplierController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do fornecedor
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Fornecedor deletado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Fornecedor deletado com sucesso
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Fornecedor não encontrado
+      security:
+        - JWT-auth: []
+      summary: Deletar fornecedor
+      tags:
+        - Fornecedores
+  /api/categories:
+    post:
+      description: Cria uma nova categoria
+      operationId: CategoriesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCategoryDto"
+      responses:
+        "201":
+          description: Categoria criada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  category_id: 1
+                  name_category: Categoria Exemplo
+                  description: Descrição da categoria
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "409":
+          description: Já existe uma categoria com este nome
+      security:
+        - JWT-auth: []
+      summary: Criar nova categoria
+      tags:
+        - Categorias
+    get:
+      description: Retorna uma lista com todas as categorias cadastradas
+      operationId: CategoriesController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: Lista de categorias
+          content:
+            application/json:
+              schema:
+                example:
+                  - category_id: 1
+                    name_category: Categoria Exemplo
+                    description: Descrição da categoria
+                  - category_id: 2
+                    name_category: Outra Categoria
+                    description: Outra descrição
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar todas as categorias
+      tags:
+        - Categorias
+  /api/categories/{id}:
+    get:
+      description: Retorna os detalhes de uma categoria específica
+      operationId: CategoriesController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da categoria
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Categoria encontrada
+          content:
+            application/json:
+              schema:
+                example:
+                  category_id: 1
+                  name_category: Categoria Exemplo
+                  description: Descrição da categoria
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Categoria não encontrada
+      security:
+        - JWT-auth: []
+      summary: Buscar categoria por ID
+      tags:
+        - Categorias
+    patch:
+      description: Atualiza os dados de uma categoria existente
+      operationId: CategoriesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da categoria
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCategoryDto"
+      responses:
+        "200":
+          description: Categoria atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  category_id: 1
+                  name_category: Categoria Atualizada
+                  description: Nova descrição
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Categoria não encontrada
+        "409":
+          description: Já existe uma categoria com este nome
+      security:
+        - JWT-auth: []
+      summary: Atualizar categoria
+      tags:
+        - Categorias
+    delete:
+      description: Remove uma categoria do sistema
+      operationId: CategoriesController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da categoria
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Categoria deletada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Categoria deletada com sucesso
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Categoria não encontrada
+      security:
+        - JWT-auth: []
+      summary: Deletar categoria
+      tags:
+        - Categorias
+  /api/sub-categories:
+    post:
+      description: Cria uma nova subcategoria vinculada a uma categoria
+      operationId: SubCategoriesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSubCategoryDto"
+      responses:
+        "201":
+          description: Subcategoria criada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  sub_category_id: 1
+                  name_sub_category: Subcategoria Exemplo
+                  description: Descrição da subcategoria
+                  category:
+                    category_id: 1
+                    name_category: Categoria Exemplo
+        "400":
+          description: Categoria não encontrada
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "409":
+          description: Já existe uma subcategoria com este nome nesta categoria
+      security:
+        - JWT-auth: []
+      summary: Criar nova subcategoria
+      tags:
+        - Subcategorias
+    get:
+      description: Retorna uma lista com todas as subcategorias cadastradas
+      operationId: SubCategoriesController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: Lista de subcategorias
+          content:
+            application/json:
+              schema:
+                example:
+                  - sub_category_id: 1
+                    name_sub_category: Subcategoria Exemplo
+                    description: Descrição da subcategoria
+                    category:
+                      category_id: 1
+                      name_category: Categoria Exemplo
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar todas as subcategorias
+      tags:
+        - Subcategorias
+  /api/sub-categories/{id}:
+    get:
+      description: Retorna os detalhes de uma subcategoria específica
+      operationId: SubCategoriesController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da subcategoria
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Subcategoria encontrada
+          content:
+            application/json:
+              schema:
+                example:
+                  sub_category_id: 1
+                  name_sub_category: Subcategoria Exemplo
+                  description: Descrição da subcategoria
+                  category:
+                    category_id: 1
+                    name_category: Categoria Exemplo
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Subcategoria não encontrada
+      security:
+        - JWT-auth: []
+      summary: Buscar subcategoria por ID
+      tags:
+        - Subcategorias
+    patch:
+      description: Atualiza os dados de uma subcategoria existente
+      operationId: SubCategoriesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da subcategoria
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSubCategoryDto"
+      responses:
+        "200":
+          description: Subcategoria atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  sub_category_id: 1
+                  name_sub_category: Subcategoria Atualizada
+                  description: Nova descrição
+                  category:
+                    category_id: 1
+                    name_category: Categoria Exemplo
+        "400":
+          description: Categoria não encontrada
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Subcategoria não encontrada
+        "409":
+          description: Já existe uma subcategoria com este nome nesta categoria
+      security:
+        - JWT-auth: []
+      summary: Atualizar subcategoria
+      tags:
+        - Subcategorias
+    delete:
+      description: Remove uma subcategoria do sistema
+      operationId: SubCategoriesController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da subcategoria
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Subcategoria deletada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Subcategoria deletada com sucesso
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Subcategoria não encontrada
+      security:
+        - JWT-auth: []
+      summary: Deletar subcategoria
+      tags:
+        - Subcategorias
+  /api/type-payment:
+    post:
+      description: Cria um novo tipo de pagamento
+      operationId: TypePaymentController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTypePaymentDto"
+      responses:
+        "201":
+          description: Tipo de pagamento criado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  type_payment_id: 1
+                  name_type_payment: Cartão de Crédito
+                  description: Pagamento via cartão de crédito
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "409":
+          description: Já existe um tipo de pagamento com este nome
+      security:
+        - JWT-auth: []
+      summary: Criar novo tipo de pagamento
+      tags:
+        - Tipos de Pagamento
+    get:
+      description: Retorna uma lista com todos os tipos de pagamento cadastrados
+      operationId: TypePaymentController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: Lista de tipos de pagamento
+          content:
+            application/json:
+              schema:
+                example:
+                  - type_payment_id: 1
+                    name_type_payment: Cartão de Crédito
+                    description: Pagamento via cartão de crédito
+                  - type_payment_id: 2
+                    name_type_payment: Boleto
+                    description: Pagamento via boleto bancário
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar todos os tipos de pagamento
+      tags:
+        - Tipos de Pagamento
+  /api/type-payment/{id}:
+    get:
+      description: Retorna os detalhes de um tipo de pagamento específico
+      operationId: TypePaymentController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do tipo de pagamento
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Tipo de pagamento encontrado
+          content:
+            application/json:
+              schema:
+                example:
+                  type_payment_id: 1
+                  name_type_payment: Cartão de Crédito
+                  description: Pagamento via cartão de crédito
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Tipo de pagamento não encontrado
+      security:
+        - JWT-auth: []
+      summary: Buscar tipo de pagamento por ID
+      tags:
+        - Tipos de Pagamento
+    patch:
+      description: Atualiza os dados de um tipo de pagamento existente
+      operationId: TypePaymentController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do tipo de pagamento
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTypePaymentDto"
+      responses:
+        "200":
+          description: Tipo de pagamento atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  type_payment_id: 1
+                  name_type_payment: Cartão de Crédito
+                  description: Pagamento via cartão de crédito
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Tipo de pagamento não encontrado
+        "409":
+          description: Já existe um tipo de pagamento com este nome
+      security:
+        - JWT-auth: []
+      summary: Atualizar tipo de pagamento
+      tags:
+        - Tipos de Pagamento
+    delete:
+      description: Remove um tipo de pagamento do sistema
+      operationId: TypePaymentController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do tipo de pagamento
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Tipo de pagamento deletado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Tipo de pagamento deletado com sucesso
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Tipo de pagamento não encontrado
+      security:
+        - JWT-auth: []
+      summary: Deletar tipo de pagamento
+      tags:
+        - Tipos de Pagamento
+  /api/payment-situation:
+    post:
+      description: Cria uma nova situação de pagamento
+      operationId: PaymentSituationController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentSituationDto"
+      responses:
+        "201":
+          description: Situação de pagamento criada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  payment_situation_id: 1
+                  name: Pago
+                  description: Pagamento realizado
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "409":
+          description: Já existe uma situação de pagamento com este nome
+      security:
+        - JWT-auth: []
+      summary: Criar nova situação de pagamento
+      tags:
+        - Situações de Pagamento
+    get:
+      description: Retorna uma lista com todas as situações de pagamento cadastradas
+      operationId: PaymentSituationController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: Lista de situações de pagamento
+          content:
+            application/json:
+              schema:
+                example:
+                  - payment_situation_id: 1
+                    name: Pago
+                    description: Pagamento realizado
+                  - payment_situation_id: 2
+                    name: Pendente
+                    description: Aguardando pagamento
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar todas as situações de pagamento
+      tags:
+        - Situações de Pagamento
+  /api/payment-situation/{id}:
+    get:
+      description: Retorna os detalhes de uma situação de pagamento específica
+      operationId: PaymentSituationController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da situação de pagamento
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Situação de pagamento encontrada
+          content:
+            application/json:
+              schema:
+                example:
+                  payment_situation_id: 1
+                  name: Pago
+                  description: Pagamento realizado
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Situação de pagamento não encontrada
+      security:
+        - JWT-auth: []
+      summary: Buscar situação de pagamento por ID
+      tags:
+        - Situações de Pagamento
+    patch:
+      description: Atualiza os dados de uma situação de pagamento existente
+      operationId: PaymentSituationController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da situação de pagamento
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePaymentSituationDto"
+      responses:
+        "200":
+          description: Situação de pagamento atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  payment_situation_id: 1
+                  name: Pago
+                  description: Pagamento realizado
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Situação de pagamento não encontrada
+        "409":
+          description: Já existe uma situação de pagamento com este nome
+      security:
+        - JWT-auth: []
+      summary: Atualizar situação de pagamento
+      tags:
+        - Situações de Pagamento
+    delete:
+      description: Remove uma situação de pagamento do sistema
+      operationId: PaymentSituationController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da situação de pagamento
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Situação de pagamento deletada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Situação de pagamento deletada com sucesso
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Situação de pagamento não encontrada
+      security:
+        - JWT-auth: []
+      summary: Deletar situação de pagamento
+      tags:
+        - Situações de Pagamento
+  /api/vacations:
+    post:
+      description: Cria um registro de férias para um funcionário
+      operationId: VacationsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVacationDto"
+      responses:
+        "201":
+          description: Férias criada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  vacation_id: uuid
+                  employee_id: uuid
+                  date_start: 2024-07-01
+                  date_end: 2024-07-15
+                  value: 1500
+                  employee:
+                    employee_id: uuid
+                    name: Funcionário Exemplo
+        "400":
+          description: Funcionário não encontrado
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Criar férias
+      tags:
+        - Férias
+    get:
+      description: Retorna uma lista de férias cadastradas
+      operationId: VacationsController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: Lista de férias
+          content:
+            application/json:
+              schema:
+                example:
+                  - vacation_id: uuid
+                    employee_id: uuid
+                    date_start: 2024-07-01
+                    date_end: 2024-07-15
+                    value: 1500
+                    employee:
+                      employee_id: uuid
+                      name: Funcionário Exemplo
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar férias
+      tags:
+        - Férias
+  /api/vacations/{id}:
+    get:
+      description: Retorna os detalhes de um registro de férias específico
+      operationId: VacationsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID das férias
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Férias encontrada
+          content:
+            application/json:
+              schema:
+                example:
+                  vacation_id: uuid
+                  employee_id: uuid
+                  date_start: 2024-07-01
+                  date_end: 2024-07-15
+                  value: 1500
+                  employee:
+                    employee_id: uuid
+                    name: Funcionário Exemplo
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Férias não encontrada
+      security:
+        - JWT-auth: []
+      summary: Buscar férias por ID
+      tags:
+        - Férias
+    patch:
+      description: Atualiza os dados de um registro de férias existente
+      operationId: VacationsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID das férias
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateVacationDto"
+      responses:
+        "200":
+          description: Férias atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  vacation_id: uuid
+                  date_start: 2024-07-02
+                  date_end: 2024-07-16
+                  value: 1600
+        "400":
+          description: Funcionário não encontrado
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Férias não encontrada
+      security:
+        - JWT-auth: []
+      summary: Atualizar férias
+      tags:
+        - Férias
+    delete:
+      description: Remove um registro de férias do sistema
+      operationId: VacationsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID das férias
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Férias deletada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Férias deletada com sucesso
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Férias não encontrada
+      security:
+        - JWT-auth: []
+      summary: Deletar férias
+      tags:
+        - Férias
+  /api/accounts:
+    post:
+      description: Cria uma nova conta
+      operationId: AccountsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAccountDto"
+      responses:
+        "201":
+          description: Conta criada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  account_id: uuid
+                  name_account: Conta Exemplo
+                  description: Descrição da conta
+                  value_start: 1000
+                  updated_at: 2024-07-01T10:00:00.000Z
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "409":
+          description: Já existe uma conta com este nome
+      security:
+        - JWT-auth: []
+      summary: Criar nova conta
+      tags:
+        - Contas
+    get:
+      description: Retorna uma lista de contas cadastradas
+      operationId: AccountsController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: Lista de contas
+          content:
+            application/json:
+              schema:
+                example:
+                  - account_id: uuid
+                    name_account: Conta Exemplo
+                    description: Descrição da conta
+                    value_start: 1000
+                    updated_at: 2024-07-01T10:00:00.000Z
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar contas
+      tags:
+        - Contas
+  /api/accounts/{id}:
+    get:
+      description: Retorna os detalhes de uma conta específica
+      operationId: AccountsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID da conta
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Conta encontrada
+          content:
+            application/json:
+              schema:
+                example:
+                  account_id: uuid
+                  name_account: Conta Exemplo
+                  description: Descrição da conta
+                  value_start: 1000
+                  updated_at: 2024-07-01T10:00:00.000Z
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Conta não encontrada
+      security:
+        - JWT-auth: []
+      summary: Buscar conta por ID
+      tags:
+        - Contas
+    patch:
+      description: Atualiza os dados de uma conta existente
+      operationId: AccountsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID da conta
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAccountDto"
+      responses:
+        "200":
+          description: Conta atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  account_id: uuid
+                  name_account: Conta Atualizada
+                  value_start: 2000
+                  updated_at: 2024-07-02T10:00:00.000Z
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Conta não encontrada
+        "409":
+          description: Já existe uma conta com este nome
+      security:
+        - JWT-auth: []
+      summary: Atualizar conta
+      tags:
+        - Contas
+    delete:
+      description: Remove uma conta do sistema
+      operationId: AccountsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID da conta
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Conta deletada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Conta deletada com sucesso
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Conta não encontrada
+      security:
+        - JWT-auth: []
+      summary: Deletar conta
+      tags:
+        - Contas
+  /api/cards:
+    post:
+      description: Cria um novo cartão vinculado a uma conta
+      operationId: CardsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCardDto"
+      responses:
+        "201":
+          description: Cartão criado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  card_id: uuid
+                  name_card: Cartão Exemplo
+                  description: Descrição do cartão
+                  number_card: 123456
+                  flag: Visa
+                  account:
+                    account_id: uuid
+                    name_account: Conta Exemplo
+        "400":
+          description: Conta não encontrada
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Criar novo cartão
+      tags:
+        - Cartões
+    get:
+      description: Retorna uma lista de cartões cadastrados
+      operationId: CardsController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: Lista de cartões
+          content:
+            application/json:
+              schema:
+                example:
+                  - card_id: uuid
+                    name_card: Cartão Exemplo
+                    description: Descrição do cartão
+                    number_card: 123456
+                    flag: Visa
+                    account:
+                      account_id: uuid
+                      name_account: Conta Exemplo
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar cartões
+      tags:
+        - Cartões
+  /api/cards/{id}:
+    get:
+      description: Retorna os detalhes de um cartão específico
+      operationId: CardsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do cartão
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cartão encontrado
+          content:
+            application/json:
+              schema:
+                example:
+                  card_id: uuid
+                  name_card: Cartão Exemplo
+                  description: Descrição do cartão
+                  number_card: 123456
+                  flag: Visa
+                  account:
+                    account_id: uuid
+                    name_account: Conta Exemplo
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Cartão não encontrado
+      security:
+        - JWT-auth: []
+      summary: Buscar cartão por ID
+      tags:
+        - Cartões
+    patch:
+      description: Atualiza os dados de um cartão existente
+      operationId: CardsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do cartão
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCardDto"
+      responses:
+        "200":
+          description: Cartão atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  card_id: uuid
+                  name_card: Cartão Atualizado
+                  flag: Master
+                  account:
+                    account_id: uuid
+                    name_account: Conta Exemplo
+        "400":
+          description: Conta não encontrada
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Cartão não encontrado
+      security:
+        - JWT-auth: []
+      summary: Atualizar cartão
+      tags:
+        - Cartões
+    delete:
+      description: Remove um cartão do sistema
+      operationId: CardsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do cartão
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cartão deletado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Cartão deletado com sucesso
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Cartão não encontrado
+      security:
+        - JWT-auth: []
+      summary: Deletar cartão
+      tags:
+        - Cartões
+  /api/historic-account:
+    post:
+      description: Cria um novo registro de histórico vinculado a uma conta
+      operationId: HistoricAccountController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateHistoricAccountDto"
+      responses:
+        "201":
+          description: Histórico criado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  historic_id: uuid
+                  account_id: uuid
+                  value_start: 1000
+                  value_end: 1200
+                  created_at: 2024-07-01T10:00:00.000Z
+                  date_change: 2024-07-01T10:00:00.000Z
+                  description: Alteração de saldo
+                  account:
+                    account_id: uuid
+                    name_account: Conta Exemplo
+        "400":
+          description: Conta não encontrada
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Criar histórico de conta
+      tags:
+        - Histórico de Conta
+    get:
+      description: Retorna uma lista de históricos de conta cadastrados
+      operationId: HistoricAccountController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: Lista de históricos
+          content:
+            application/json:
+              schema:
+                example:
+                  - historic_id: uuid
+                    account_id: uuid
+                    value_start: 1000
+                    value_end: 1200
+                    created_at: 2024-07-01T10:00:00.000Z
+                    date_change: 2024-07-01T10:00:00.000Z
+                    description: Alteração de saldo
+                    account:
+                      account_id: uuid
+                      name_account: Conta Exemplo
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar históricos de conta
+      tags:
+        - Histórico de Conta
+  /api/historic-account/{id}:
+    get:
+      description: Retorna os detalhes de um histórico específico
+      operationId: HistoricAccountController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do histórico
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Histórico encontrado
+          content:
+            application/json:
+              schema:
+                example:
+                  historic_id: uuid
+                  account_id: uuid
+                  value_start: 1000
+                  value_end: 1200
+                  created_at: 2024-07-01T10:00:00.000Z
+                  date_change: 2024-07-01T10:00:00.000Z
+                  description: Alteração de saldo
+                  account:
+                    account_id: uuid
+                    name_account: Conta Exemplo
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Histórico não encontrado
+      security:
+        - JWT-auth: []
+      summary: Buscar histórico por ID
+      tags:
+        - Histórico de Conta
+    patch:
+      description: Atualiza os dados de um histórico de conta existente
+      operationId: HistoricAccountController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do histórico
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateHistoricAccountDto"
+      responses:
+        "200":
+          description: Histórico atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  historic_id: uuid
+                  value_start: 1100
+                  value_end: 1300
+                  date_change: 2024-07-02T10:00:00.000Z
+        "400":
+          description: Conta não encontrada
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Histórico não encontrado
+      security:
+        - JWT-auth: []
+      summary: Atualizar histórico de conta
+      tags:
+        - Histórico de Conta
+    delete:
+      description: Remove um registro de histórico do sistema
+      operationId: HistoricAccountController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID do histórico
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Histórico deletado com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Histórico deletado com sucesso
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Histórico não encontrado
+      security:
+        - JWT-auth: []
+      summary: Deletar histórico de conta
+      tags:
+        - Histórico de Conta
+  /api/entries:
+    post:
+      description: Cria uma nova entrada vinculada a funcionário, conta, situação de
+        pagamento e ordem de serviço
+      operationId: EntriesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEntryDto"
+      responses:
+        "201":
+          description: Entrada criada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  entries_id: uuid
+                  NF: 123
+                  days_expired: 5
+                  account:
+                    account_id: uuid
+                    name_account: Conta Exemplo
+                  company: Empresa Exemplo
+                  value: 1000
+                  date_faturamento: 2024-07-01
+                  due_date: 2024-07-10
+                  payment_situation:
+                    payment_situation_id: 1
+                    name: Pago
+                  date_payment: 2024-07-11
+                  orders_service:
+                    os_id: uuid
+                    description: Ordem de Serviço Exemplo
+        "400":
+          description: Relacionamento não encontrado
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Criar entrada
+      tags:
+        - Entradas
+    get:
+      description: Retorna uma lista de entradas cadastradas com filtros e paginação
+      operationId: EntriesController_findAll
+      parameters:
+        - name: employee_id
+          required: false
+          in: query
+          description: ID do funcionário
+          schema:
+            type: string
+        - name: account_id
+          required: false
+          in: query
+          description: ID da conta
+          schema:
+            type: string
+        - name: payment_situation_id
+          required: false
+          in: query
+          description: ID da situação de pagamento
+          schema:
+            type: number
+        - name: os_id
+          required: false
+          in: query
+          description: ID da ordem de serviço
+          schema:
+            type: string
+        - name: company
+          required: false
+          in: query
+          description: Empresa
+          schema:
+            type: string
+        - name: date_faturamento
+          required: false
+          in: query
+          description: Data de faturamento
+          schema:
+            type: string
+        - name: due_date
+          required: false
+          in: query
+          description: Data de vencimento
+          schema:
+            type: string
+        - name: offset
+          required: false
+          in: query
+          description: "Paginação: offset"
+          schema:
+            type: number
+        - name: limit
+          required: false
+          in: query
+          description: "Paginação: limit"
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Lista de entradas
+          content:
+            application/json:
+              schema:
+                example:
+                  total: 1
+                  items:
+                    - entries_id: uuid
+                      employee:
+                        employee_id: uuid
+                        name: Funcionário Exemplo
+                      NF: 123
+                      days_expired: 5
+                      account:
+                        account_id: uuid
+                        name_account: Conta Exemplo
+                      company: Empresa Exemplo
+                      value: 1000
+                      date_faturamento: 2024-07-01
+                      due_date: 2024-07-10
+                      payment_situation:
+                        payment_situation_id: 1
+                        name: Pago
+                      date_payment: 2024-07-11
+                      orders_service:
+                        os_id: uuid
+                        description: Ordem de Serviço Exemplo
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar entradas
+      tags:
+        - Entradas
+  /api/entries/{id}:
+    get:
+      description: Retorna os detalhes de uma entrada específica
+      operationId: EntriesController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID da entrada
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Entrada encontrada
+          content:
+            application/json:
+              schema:
+                example:
+                  entries_id: uuid
+                  employee:
+                    employee_id: uuid
+                    name: Funcionário Exemplo
+                  NF: 123
+                  days_expired: 5
+                  account:
+                    account_id: uuid
+                    name_account: Conta Exemplo
+                  company: Empresa Exemplo
+                  value: 1000
+                  date_faturamento: 2024-07-01
+                  due_date: 2024-07-10
+                  payment_situation:
+                    payment_situation_id: 1
+                    name: Pago
+                  date_payment: 2024-07-11
+                  orders_service:
+                    os_id: uuid
+                    description: Ordem de Serviço Exemplo
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Entrada não encontrada
+      security:
+        - JWT-auth: []
+      summary: Buscar entrada por ID
+      tags:
+        - Entradas
+    patch:
+      description: Atualiza os dados de uma entrada existente
+      operationId: EntriesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID da entrada
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEntryDto"
+      responses:
+        "200":
+          description: Entrada atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  entries_id: uuid
+                  NF: 124
+                  value: 1200
+        "400":
+          description: Relacionamento não encontrado
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Entrada não encontrada
+      security:
+        - JWT-auth: []
+      summary: Atualizar entrada
+      tags:
+        - Entradas
+    delete:
+      description: Remove uma entrada do sistema
+      operationId: EntriesController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID da entrada
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Entrada deletada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Entrada deletada com sucesso
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Entrada não encontrada
+      security:
+        - JWT-auth: []
+      summary: Deletar entrada
+      tags:
+        - Entradas
+  /api/expense:
+    post:
+      description: Cria uma nova despesa vinculada aos relacionamentos obrigatórios
+      operationId: ExpenseController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateExpenseDto"
+      responses:
+        "201":
+          description: Despesa criada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  expense_id: uuid
+                  description: Despesa Exemplo
+                  value: 100
+                  date_expense: 2024-07-01
+                  status: pago
+                  means_due_date: 2024-07-10
+                  NF: "12345"
+                  NR: 1
+                  type_payment_id: 1
+                  account_id: uuid
+                  supplier_id: uuid
+                  os_id: uuid
+        "400":
+          description: Relacionamento não encontrado
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Criar despesa
+      tags:
+        - Despesas
+    get:
+      description: Retorna uma lista de despesas cadastradas com filtros e paginação
+      operationId: ExpenseController_findAll
+      parameters:
+        - name: client_id
+          required: false
+          in: query
+          description: ID do cliente
+          schema:
+            type: string
+        - name: sub_category_id
+          required: false
+          in: query
+          description: ID da subcategoria
+          schema:
+            type: number
+        - name: type_payment_id
+          required: false
+          in: query
+          description: ID do tipo de pagamento
+          schema:
+            type: number
+        - name: card_id
+          required: false
+          in: query
+          description: ID do cartão
+          schema:
+            type: string
+        - name: account_id
+          required: false
+          in: query
+          description: ID da conta
+          schema:
+            type: string
+        - name: supplier_id
+          required: false
+          in: query
+          description: ID do fornecedor
+          schema:
+            type: string
+        - name: os_id
+          required: false
+          in: query
+          description: ID da ordem de serviço
+          schema:
+            type: string
+        - name: status
+          required: false
+          in: query
+          description: Status da despesa
+          schema:
+            type: string
+            enum:
+              - pago
+              - aberto
+              - agendado
+        - name: date_expense
+          required: false
+          in: query
+          description: Data da despesa
+          schema:
+            type: string
+        - name: means_due_date
+          required: false
+          in: query
+          description: Data de vencimento
+          schema:
+            type: string
+        - name: offset
+          required: false
+          in: query
+          description: "Paginação: offset"
+          schema:
+            type: number
+        - name: limit
+          required: false
+          in: query
+          description: "Paginação: limit"
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Lista de despesas
+          content:
+            application/json:
+              schema:
+                example:
+                  total: 1
+                  items:
+                    - expense_id: uuid
+                      description: Despesa Exemplo
+                      value: 100
+                      date_expense: 2024-07-01
+                      status: pago
+                      means_due_date: 2024-07-10
+                      NF: "12345"
+                      NR: 1
+                      type_payment_id: 1
+                      account_id: uuid
+                      supplier_id: uuid
+                      os_id: uuid
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+      security:
+        - JWT-auth: []
+      summary: Listar despesas
+      tags:
+        - Despesas
+  /api/expense/{id}:
+    get:
+      description: Retorna os detalhes de uma despesa específica
+      operationId: ExpenseController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID da despesa
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Despesa encontrada
+          content:
+            application/json:
+              schema:
+                example:
+                  expense_id: uuid
+                  description: Despesa Exemplo
+                  value: 100
+                  date_expense: 2024-07-01
+                  status: pago
+                  means_due_date: 2024-07-10
+                  NF: "12345"
+                  NR: 1
+                  type_payment_id: 1
+                  account_id: uuid
+                  supplier_id: uuid
+                  os_id: uuid
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Despesa não encontrada
+      security:
+        - JWT-auth: []
+      summary: Buscar despesa por ID
+      tags:
+        - Despesas
+    patch:
+      description: Atualiza os dados de uma despesa existente
+      operationId: ExpenseController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID da despesa
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateExpenseDto"
+      responses:
+        "200":
+          description: Despesa atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  expense_id: uuid
+                  description: Despesa Atualizada
+                  value: 200
+        "400":
+          description: Relacionamento não encontrado
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Despesa não encontrada
+      security:
+        - JWT-auth: []
+      summary: Atualizar despesa
+      tags:
+        - Despesas
+    delete:
+      description: Remove uma despesa do sistema
+      operationId: ExpenseController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: UUID da despesa
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Despesa deletada com sucesso
+          content:
+            application/json:
+              schema:
+                example:
+                  message: Despesa deletada com sucesso
+        "401":
+          description: Não autorizado
+        "403":
+          description: Acesso negado
+        "404":
+          description: Despesa não encontrada
+      security:
+        - JWT-auth: []
+      summary: Deletar despesa
+      tags:
+        - Despesas
+info:
+  title: 🐢 Kame Backend API
+  description: "
+
+    \      ## KameAPI - Sistema Financeiro Empresarial
+
+    \     \ 
+
+    \      A **KameAPI** é uma plataforma REST desenvolvida para gerenciar o
+    fluxo financeiro empresarial da **Kame Equipamentos Industriais LTDA**.
+
+    \     \ 
+
+    \      O sistema tem como objetivo automatizar e centralizar o controle
+    financeiro, permitindo o gerenciamento completo de usuários, colaboradores,
+    funções, transações, relatórios e auditorias.
+
+    \     \ 
+
+    \      ### 💼 Com ela, é possível:
+
+    \     \ 
+
+    \      - ✅ Registrar e acompanhar movimentações financeiras (entradas e
+    saídas)
+
+    \      - ✅ Controlar permissões e acessos de usuários
+
+    \      - ✅ Manter a organização e rastreabilidade das operações
+
+    \      - ✅ Gerar relatórios precisos para análise e tomada de decisão
+
+    \     \ 
+
+    \      Projetada com foco em **segurança**, **eficiência** e **integração**,
+    a KameAPI é uma base sólida para a gestão financeira moderna da empresa.
+
+    \     \ 
+
+    \      ---
+
+    \     \ 
+
+    \      ### 🔐 Autenticação
+
+    \      Esta API utiliza **JWT Bearer Token** com validade de **3 horas**.
+
+    \    "
+  version: 1.0.0
+  contact:
+    name: Equipe Kame
+    url: https://kame.com.br
+    email: contato@kame.com.br
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+tags:
+  - name: 📚 Documentação
+    description: Guias e documentação completa da API
+  - name: Autenticação
+    description: 🔐 Endpoints de autenticação e autorização JWT
+  - name: Usuários
+    description: 👥 Gerenciamento de usuários do sistema
+  - name: Níveis de Acesso
+    description: 🔑 Controle de níveis de acesso e permissões
+  - name: Colaboradores
+    description: 👔 Gestão de colaboradores e funcionários
+  - name: Transações
+    description: 💰 Controle de transações financeiras
+  - name: Relatórios
+    description: 📊 Geração de relatórios financeiros
+  - name: Auditoria
+    description: 📝 Logs e auditoria do sistema
+servers:
+  - url: http://localhost:3000
+    description: Ambiente de Desenvolvimento
+  - url: https://api.kame.com.br
+    description: Ambiente de Produção
+components:
+  securitySchemes:
+    JWT-auth:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      name: JWT
+      description: Token JWT obtido no login (válido por 3 horas)
+      in: header
+    X-API-KEY:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+      description: API Key para autenticação administrativa
+  schemas:
+    CreateAccessLevelDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Admin
+          description: Nome do nível de acesso
+        description:
+          type: string
+          example: Acesso total ao sistema
+          description: Descrição do nível de acesso
+      required:
+        - name
+    CreateUserDto:
+      type: object
+      properties:
+        username:
+          type: string
+          example: johndoe
+          description: Nome de usuário
+        password:
+          type: string
+          example: S3nh@F0rt3!
+          description: Senha do usuário
+        accessLevelId:
+          type: number
+          example: 1
+          description: ID do nível de acesso
+        employeeId:
+          type: object
+          example: 550e8400-e29b-41d4-a716-446655440000
+          description: ID do funcionário (opcional)
+      required:
+        - username
+        - password
+        - accessLevelId
+    UpdateUserDto:
+      type: object
+      properties:
+        username:
+          type: string
+          example: johndoe
+          description: Nome de usuário
+        password:
+          type: string
+          example: S3nh@F0rt3!
+          description: Senha do usuário
+        accessLevelId:
+          type: number
+          example: 1
+          description: ID do nível de acesso
+        employeeId:
+          type: object
+          example: 550e8400-e29b-41d4-a716-446655440000
+          description: ID do funcionário (opcional)
+    LoginDto:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Nome de usuário para login
+          example: joaosilva
+          minLength: 3
+        password:
+          type: string
+          description: Senha do usuário
+          example: Senha@123
+          minLength: 6
+      required:
+        - username
+        - password
+    CreateStatusGeneralDto:
+      type: object
+      properties:
+        name_status:
+          type: string
+          description: Nome do status
+          example: Ativo
+          maxLength: 50
+        description:
+          type: string
+          description: Descrição do status
+          example: Status para indicar que o item está ativo
+          maxLength: 255
+      required:
+        - name_status
+    UpdateStatusGeneralDto:
+      type: object
+      properties:
+        name_status:
+          type: string
+          description: Nome do status
+          example: Inativo
+          maxLength: 50
+        description:
+          type: string
+          description: Descrição do status
+          example: Status para indicar que o item está inativo
+          maxLength: 255
+    CreateSegmentDto:
+      type: object
+      properties:
+        name_segment:
+          type: string
+          description: Nome do segmento
+          example: Varejo
+          maxLength: 100
+        description:
+          type: string
+          description: Descrição do segmento
+          example: Segmento de lojas de varejo
+          maxLength: 255
+      required:
+        - name_segment
+    UpdateSegmentDto:
+      type: object
+      properties:
+        name_segment:
+          type: string
+          description: Nome do segmento
+          example: Atacado
+          maxLength: 100
+        description:
+          type: string
+          description: Descrição do segmento
+          example: Segmento de lojas de atacado
+          maxLength: 255
+    CreateClientDto:
+      type: object
+      properties:
+        name_client:
+          type: string
+          description: Nome do cliente
+          example: João Silva Comércio LTDA
+          maxLength: 255
+        email:
+          type: string
+          description: Email do cliente
+          example: contato@joaosilva.com.br
+          maxLength: 255
+        phone:
+          type: string
+          description: Telefone do cliente (pode enviar com ou sem pontuação, será salvo
+            sem)
+          example: (11) 98765-4321
+          maxLength: 20
+        address:
+          type: string
+          description: Endereço do cliente
+          example: Rua das Flores, 123 - Centro - São Paulo/SP
+          maxLength: 255
+        CPF_CNPJ:
+          type: string
+          description: CPF ou CNPJ do cliente (pode enviar com ou sem pontuação, será
+            salvo sem)
+          example: 12.345.678/0001-90
+          maxLength: 18
+        name_responsible:
+          type: string
+          description: Nome do responsável
+          example: João Silva
+          maxLength: 255
+        corporate_name:
+          type: string
+          description: Razão social
+          example: João Silva Comércio de Produtos Alimentícios LTDA
+          maxLength: 255
+        status_id:
+          type: number
+          description: ID do status (referência da tabela status_general)
+          example: 1
+        segment_id:
+          type: number
+          description: ID do segmento (referência da tabela segments)
+          example: 1
+      required:
+        - name_client
+        - email
+        - phone
+        - address
+        - CPF_CNPJ
+        - name_responsible
+        - corporate_name
+        - status_id
+        - segment_id
+    UpdateClientDto:
+      type: object
+      properties:
+        name_client:
+          type: string
+          description: Nome do cliente
+          example: João Silva Comércio LTDA
+          maxLength: 255
+        email:
+          type: string
+          description: Email do cliente
+          example: novo@joaosilva.com.br
+          maxLength: 255
+        phone:
+          type: string
+          description: Telefone do cliente (pode enviar com ou sem pontuação, será salvo
+            sem)
+          example: (11) 91234-5678
+          maxLength: 20
+        address:
+          type: string
+          description: Endereço do cliente
+          example: Av. Paulista, 1000 - Bela Vista - São Paulo/SP
+          maxLength: 255
+        CPF_CNPJ:
+          type: string
+          description: CPF ou CNPJ do cliente (pode enviar com ou sem pontuação, será
+            salvo sem)
+          example: 12.345.678/0001-90
+          maxLength: 18
+        name_responsible:
+          type: string
+          description: Nome do responsável
+          example: Maria Silva
+          maxLength: 255
+        corporate_name:
+          type: string
+          description: Razão social
+          example: João Silva Comércio de Produtos Alimentícios LTDA
+          maxLength: 255
+        status_id:
+          type: number
+          description: ID do status (referência da tabela status_general)
+          example: 2
+        segment_id:
+          type: number
+          description: ID do segmento (referência da tabela segments)
+          example: 2
+    CreateRoleDto:
+      type: object
+      properties:
+        role_name:
+          type: string
+          description: Nome do papel/função
+          example: Vendedor
+          maxLength: 50
+        description:
+          type: string
+          description: Descrição do papel/função
+          example: Responsável por vendas e atendimento ao cliente
+          maxLength: 255
+      required:
+        - role_name
+    UpdateRoleDto:
+      type: object
+      properties:
+        role_name:
+          type: string
+          description: Nome do papel/função
+          example: Gerente de Vendas
+          maxLength: 50
+        description:
+          type: string
+          description: Descrição do papel/função
+          example: Responsável por coordenar a equipe de vendas
+          maxLength: 255
+    CreateEmployeeDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome completo do funcionário
+          example: João Silva
+          maxLength: 255
+        role_id:
+          type: number
+          description: ID do papel/função (referência da tabela roles)
+          example: 1
+        email:
+          type: string
+          description: Email do funcionário
+          example: joao.silva@empresa.com
+          maxLength: 255
+        address:
+          type: string
+          description: Endereço do funcionário
+          example: Rua das Flores, 123 - Centro - São Paulo/SP
+          maxLength: 255
+        CPF:
+          type: string
+          description: CPF do funcionário (pode enviar com ou sem pontuação, será salvo sem)
+          example: 123.456.789-00
+          maxLength: 14
+        salary:
+          type: number
+          description: Salário do funcionário
+          example: 3500
+      required:
+        - name
+        - role_id
+        - email
+        - address
+        - CPF
+        - salary
+    UpdateEmployeeDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome completo do funcionário
+          example: João Silva Santos
+          maxLength: 255
+        role_id:
+          type: number
+          description: ID do papel/função (referência da tabela roles)
+          example: 2
+        email:
+          type: string
+          description: Email do funcionário
+          example: joao.santos@empresa.com
+          maxLength: 255
+        address:
+          type: string
+          description: Endereço do funcionário
+          example: Av. Paulista, 1000 - Bela Vista - São Paulo/SP
+          maxLength: 255
+        CPF:
+          type: string
+          description: CPF do funcionário (pode enviar com ou sem pontuação, será salvo sem)
+          example: 987.654.321-00
+          maxLength: 14
+        salary:
+          type: number
+          description: Salário do funcionário
+          example: 4000
+    CreateBudgetTypeDto:
+      type: object
+      properties:
+        name_type:
+          type: string
+          description: Nome do tipo de orçamento
+          example: Orçamento Padrão
+          maxLength: 50
+        description:
+          type: string
+          description: Descrição do tipo de orçamento
+          example: Modelo de orçamento padrão para serviços gerais
+          maxLength: 255
+      required:
+        - name_type
+    UpdateBudgetTypeDto:
+      type: object
+      properties:
+        name_type:
+          type: string
+          description: Nome do tipo de orçamento
+          example: Orçamento Personalizado
+          maxLength: 50
+        description:
+          type: string
+          description: Descrição do tipo de orçamento
+          example: Modelo de orçamento personalizado para clientes especiais
+          maxLength: 255
+    CreateStatusBudgetDto:
+      type: object
+      properties:
+        name_status:
+          type: string
+          description: Nome do status do orçamento
+          example: Em Análise
+          maxLength: 50
+        description:
+          type: string
+          description: Descrição do status do orçamento
+          example: Orçamento aguardando análise da equipe comercial
+          maxLength: 255
+      required:
+        - name_status
+    UpdateStatusBudgetDto:
+      type: object
+      properties:
+        name_status:
+          type: string
+          description: Nome do status do orçamento
+          example: Aprovado
+          maxLength: 50
+        description:
+          type: string
+          description: Descrição do status do orçamento
+          example: Orçamento aprovado e pronto para execução
+          maxLength: 255
+    CreateBudgetDto:
+      type: object
+      properties:
+        client_id:
+          type: string
+          description: ID do cliente
+          example: 550e8400-e29b-41d4-a716-446655440000
+        status_id:
+          type: number
+          description: ID do status do orçamento
+          example: 1
+        type_id:
+          type: number
+          description: ID do tipo de orçamento
+          example: 1
+        value:
+          type: number
+          description: Valor do orçamento
+          example: 1500
+        employee_id:
+          type: string
+          description: ID do funcionário responsável
+          example: 550e8400-e29b-41d4-a716-446655440000
+        description_budget:
+          type: string
+          description: Descrição do orçamento
+          example: Orçamento para reforma elétrica
+          maxLength: 255
+        date_status_update:
+          type: string
+          description: Data da última atualização de status
+          example: 2024-06-01
+        status:
+          type: string
+          description: Status do orçamento
+          enum:
+            - pending
+            - approved
+            - rejected
+          example: pending
+      required:
+        - client_id
+        - status_id
+        - type_id
+        - value
+        - employee_id
+        - description_budget
+        - date_status_update
+        - status
+    UpdateBudgetDto:
+      type: object
+      properties:
+        client_id:
+          type: string
+          description: ID do cliente
+        status_id:
+          type: number
+          description: ID do status do orçamento
+          example: 1
+        type_id:
+          type: number
+          description: ID do tipo de orçamento
+          example: 1
+        value:
+          type: number
+          description: Valor do orçamento
+          example: 1500
+        employee_id:
+          type: string
+          description: ID do funcionário responsável
+        description_budget:
+          type: string
+          description: Descrição do orçamento
+          example: Orçamento para reforma elétrica
+          maxLength: 255
+        date_status_update:
+          type: string
+          description: Data da última atualização de status
+          example: 2024-06-01
+        status:
+          type: string
+          description: Status do orçamento
+          enum:
+            - pending
+            - approved
+            - rejected
+          example: pending
+    CreateFreightDto:
+      type: object
+      properties:
+        name_freight:
+          type: string
+          description: Nome do frete
+          maxLength: 100
+        description:
+          type: string
+          description: Descrição do frete
+          maxLength: 255
+      required:
+        - name_freight
+    UpdateFreightDto:
+      type: object
+      properties:
+        name_freight:
+          type: string
+          description: Nome do frete
+          maxLength: 100
+        description:
+          type: string
+          description: Descrição do frete
+          maxLength: 255
+    CreateOrdersServiceDto:
+      type: object
+      properties:
+        budget_id:
+          type: string
+          description: ID do orçamento aprovado
+        description:
+          type: string
+          description: Descrição da ordem de serviço
+          maxLength: 255
+        approved_by:
+          type: string
+          description: Nome de quem aprovou
+          maxLength: 50
+      required:
+        - budget_id
+        - description
+        - approved_by
+    UpdateOrdersServiceDto:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Status da ordem de serviço
+          enum:
+            - aprovado
+            - andamento
+            - cancelado
+        description:
+          type: string
+          description: Descrição da ordem de serviço
+          maxLength: 255
+        approved_by:
+          type: string
+          description: Nome de quem aprovou
+          maxLength: 50
+        date:
+          type: string
+          description: Data da ordem de serviço
+        freight_id:
+          type: string
+          description: ID do frete
+        moodle:
+          type: boolean
+          description: Flag moodle
+    CreateSupplierDto:
+      type: object
+      properties:
+        name_supplier:
+          type: string
+          description: Nome do fornecedor
+          maxLength: 255
+        email:
+          type: string
+          description: Email do fornecedor
+          maxLength: 255
+        phone:
+          type: string
+          description: Telefone do fornecedor
+          maxLength: 20
+        address:
+          type: string
+          description: Endereço do fornecedor
+          maxLength: 255
+        CPF_CNPJ:
+          type: string
+          description: CPF ou CNPJ do fornecedor
+          maxLength: 18
+        name_responsible:
+          type: string
+          description: Nome do responsável
+          maxLength: 255
+        corporate_name:
+          type: string
+          description: Razão social
+          maxLength: 255
+        status_id:
+          type: number
+          description: ID do status
+        segment_id:
+          type: number
+          description: ID do segmento
+        client_id:
+          type: string
+          description: ID do cliente
+      required:
+        - name_supplier
+        - email
+        - phone
+        - address
+        - CPF_CNPJ
+        - name_responsible
+        - corporate_name
+        - status_id
+        - segment_id
+    UpdateSupplierDto:
+      type: object
+      properties:
+        name_supplier:
+          type: string
+          description: Nome do fornecedor
+          maxLength: 255
+        email:
+          type: string
+          description: Email do fornecedor
+          maxLength: 255
+        phone:
+          type: string
+          description: Telefone do fornecedor
+          maxLength: 20
+        address:
+          type: string
+          description: Endereço do fornecedor
+          maxLength: 255
+        CPF_CNPJ:
+          type: string
+          description: CPF ou CNPJ do fornecedor
+          maxLength: 18
+        name_responsible:
+          type: string
+          description: Nome do responsável
+          maxLength: 255
+        corporate_name:
+          type: string
+          description: Razão social
+          maxLength: 255
+        status_id:
+          type: number
+          description: ID do status
+        segment_id:
+          type: number
+          description: ID do segmento
+        client_id:
+          type: string
+          description: ID do cliente
+    CreateCategoryDto:
+      type: object
+      properties:
+        name_category:
+          type: string
+          description: Nome da categoria
+          maxLength: 100
+        description:
+          type: string
+          description: Descrição da categoria
+          maxLength: 255
+      required:
+        - name_category
+    UpdateCategoryDto:
+      type: object
+      properties:
+        name_category:
+          type: string
+          description: Nome da categoria
+          maxLength: 100
+        description:
+          type: string
+          description: Descrição da categoria
+          maxLength: 255
+    CreateSubCategoryDto:
+      type: object
+      properties:
+        name_sub_category:
+          type: string
+          description: Nome da subcategoria
+          maxLength: 100
+        description:
+          type: string
+          description: Descrição da subcategoria
+          maxLength: 255
+        category_id:
+          type: number
+          description: ID da categoria
+      required:
+        - name_sub_category
+        - category_id
+    UpdateSubCategoryDto:
+      type: object
+      properties:
+        name_sub_category:
+          type: string
+          description: Nome da subcategoria
+          maxLength: 100
+        description:
+          type: string
+          description: Descrição da subcategoria
+          maxLength: 255
+        category_id:
+          type: number
+          description: ID da categoria
+    CreateTypePaymentDto:
+      type: object
+      properties:
+        name_type_payment:
+          type: string
+          description: Nome do tipo de pagamento
+          maxLength: 50
+        description:
+          type: string
+          description: Descrição do tipo de pagamento
+          maxLength: 255
+      required:
+        - name_type_payment
+    UpdateTypePaymentDto:
+      type: object
+      properties:
+        name_type_payment:
+          type: string
+          description: Nome do tipo de pagamento
+          maxLength: 50
+        description:
+          type: string
+          description: Descrição do tipo de pagamento
+          maxLength: 255
+    CreatePaymentSituationDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome da situação de pagamento
+          maxLength: 50
+        description:
+          type: string
+          description: Descrição da situação de pagamento
+          maxLength: 50
+      required:
+        - name
+        - description
+    UpdatePaymentSituationDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome da situação de pagamento
+          maxLength: 50
+        description:
+          type: string
+          description: Descrição da situação de pagamento
+          maxLength: 50
+    CreateVacationDto:
+      type: object
+      properties:
+        employee_id:
+          type: string
+          description: ID do funcionário
+        date_start:
+          type: string
+          description: Data de início das férias
+        date_end:
+          type: string
+          description: Data de término das férias
+        value:
+          type: number
+          description: Valor das férias
+      required:
+        - employee_id
+        - date_start
+        - date_end
+        - value
+    UpdateVacationDto:
+      type: object
+      properties:
+        employee_id:
+          type: string
+          description: ID do funcionário
+        date_start:
+          type: string
+          description: Data de início das férias
+        date_end:
+          type: string
+          description: Data de término das férias
+        value:
+          type: number
+          description: Valor das férias
+    CreateAccountDto:
+      type: object
+      properties:
+        name_account:
+          type: string
+          description: Nome da conta
+          maxLength: 100
+        description:
+          type: string
+          description: Descrição da conta
+          maxLength: 255
+        value_start:
+          type: number
+          description: Valor inicial da conta
+      required:
+        - name_account
+    UpdateAccountDto:
+      type: object
+      properties:
+        name_account:
+          type: string
+          description: Nome da conta
+          maxLength: 100
+        description:
+          type: string
+          description: Descrição da conta
+          maxLength: 255
+        value_start:
+          type: number
+          description: Valor inicial da conta
+    CreateCardDto:
+      type: object
+      properties:
+        name_card:
+          type: string
+          description: Nome do cartão
+          maxLength: 100
+        description:
+          type: string
+          description: Descrição do cartão
+          maxLength: 255
+        number_card:
+          type: integer
+          description: Número do cartão
+        flag:
+          type: string
+          description: Bandeira do cartão
+          maxLength: 10
+        account_id:
+          type: string
+          description: ID da conta
+      required:
+        - name_card
+        - number_card
+        - flag
+        - account_id
+    UpdateCardDto:
+      type: object
+      properties:
+        name_card:
+          type: string
+          description: Nome do cartão
+          maxLength: 100
+        description:
+          type: string
+          description: Descrição do cartão
+          maxLength: 255
+        number_card:
+          type: integer
+          description: Número do cartão
+        flag:
+          type: string
+          description: Bandeira do cartão
+          maxLength: 10
+        account_id:
+          type: string
+          description: ID da conta
+    CreateHistoricAccountDto:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: ID da conta
+        value_start:
+          type: number
+          description: Valor inicial
+        value_end:
+          type: number
+          description: Valor final
+        description:
+          type: string
+          description: Descrição
+          maxLength: 255
+      required:
+        - account_id
+    UpdateHistoricAccountDto:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: ID da conta
+        value_start:
+          type: number
+          description: Valor inicial
+        value_end:
+          type: number
+          description: Valor final
+        description:
+          type: string
+          description: Descrição
+          maxLength: 255
+    CreateEntryDto:
+      type: object
+      properties:
+        NF:
+          type: integer
+          description: Número da nota fiscal
+        account_id:
+          type: string
+          description: ID da conta
+        company:
+          type: string
+          description: Empresa
+          maxLength: 255
+        value:
+          type: number
+          description: Valor
+        date_faturamento:
+          type: string
+          description: Data de faturamento
+        due_date:
+          type: string
+          description: Data de vencimento
+        payment_situation_id:
+          type: integer
+          description: ID da situação de pagamento
+        date_payment:
+          type: string
+          description: Data do pagamento
+        os_id:
+          type: string
+          description: ID da ordem de serviço
+      required:
+        - NF
+        - account_id
+        - company
+        - value
+        - date_faturamento
+        - due_date
+        - payment_situation_id
+        - os_id
+    UpdateEntryDto:
+      type: object
+      properties:
+        employee_id:
+          type: string
+          description: ID do funcionário
+        NF:
+          type: integer
+          description: Número da nota fiscal
+        days_expired:
+          type: integer
+          description: Dias vencidos
+        account_id:
+          type: string
+          description: ID da conta
+        company:
+          type: string
+          description: Empresa
+          maxLength: 255
+        value:
+          type: number
+          description: Valor
+        date_faturamento:
+          type: string
+          description: Data de faturamento
+        due_date:
+          type: string
+          description: Data de vencimento
+        payment_situation_id:
+          type: integer
+          description: ID da situação de pagamento
+        date_payment:
+          type: string
+          description: Data do pagamento
+        os_id:
+          type: string
+          description: ID da ordem de serviço
+    CreateExpenseDto:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Descrição da despesa
+          maxLength: 255
+        value:
+          type: number
+          description: Valor da despesa
+        date_expense:
+          type: string
+          description: Data da despesa
+        client_id:
+          type: string
+          description: ID do cliente
+        sub_category_id:
+          type: integer
+          description: ID da subcategoria
+        status:
+          type: string
+          description: Status da despesa
+          enum:
+            - pago
+            - aberto
+            - agendado
+        date_agendamento:
+          type: string
+          description: Data de agendamento
+        means_due_date:
+          type: string
+          description: Data de vencimento
+        NF:
+          type: string
+          description: Número da nota fiscal
+          maxLength: 20
+        NR:
+          type: integer
+          description: Número de registro
+        type_payment_id:
+          type: integer
+          description: ID do tipo de pagamento
+        card_id:
+          type: string
+          description: ID do cartão
+        account_id:
+          type: string
+          description: ID da conta
+        supplier_id:
+          type: string
+          description: ID do fornecedor
+        os_id:
+          type: string
+          description: ID da ordem de serviço
+      required:
+        - description
+        - value
+        - date_expense
+        - sub_category_id
+        - status
+        - type_payment_id
+        - account_id
+    UpdateExpenseDto:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Descrição da despesa
+          maxLength: 255
+        value:
+          type: number
+          description: Valor da despesa
+        date_expense:
+          type: string
+          description: Data da despesa
+        client_id:
+          type: string
+          description: ID do cliente
+        sub_category_id:
+          type: integer
+          description: ID da subcategoria
+        status:
+          type: string
+          description: Status da despesa
+          enum:
+            - pago
+            - aberto
+            - agendado
+        date_agendamento:
+          type: string
+          description: Data de agendamento
+        means_due_date:
+          type: string
+          description: Data de vencimento
+        NF:
+          type: string
+          description: Número da nota fiscal
+          maxLength: 20
+        NR:
+          type: integer
+          description: Número de registro
+        type_payment_id:
+          type: integer
+          description: ID do tipo de pagamento
+        card_id:
+          type: string
+          description: ID do cartão
+        account_id:
+          type: string
+          description: ID da conta
+        supplier_id:
+          type: string
+          description: ID do fornecedor
+        os_id:
+          type: string
+          description: ID da ordem de serviço

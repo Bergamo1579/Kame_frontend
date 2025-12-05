@@ -1,0 +1,346 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Toast animations */
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+/* Sidebar layout - smooth transitions */
+@media (min-width: 768px) {
+  body.sidebar-open main {
+    margin-left: 14rem; /* 56 = w-56 */
+  }
+  
+  body.sidebar-closed main {
+    margin-left: 4rem; /* 16 = w-16 */
+  }
+  
+  main {
+    transition: margin-left 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Mobile animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 200ms ease-out;
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideUp {
+  animation: slideUp 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Toast notification animation */
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideIn {
+  animation: slideIn 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Custom loading spinner */
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #09f;
+  animation: spin 1s ease infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Modal backdrop and content - Fixed styles */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  padding: 1rem;
+}
+
+.modal-backdrop.show {
+  opacity: 1;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 28rem;
+  width: 100%;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  border-left: 4px solid #ef4444;
+  transform: translateY(-20px);
+  opacity: 0;
+  transition: all 0.3s ease-out;
+}
+
+.modal-content.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Animation classes - versões mais suaves */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideIn {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-4px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* Oculta o ícone de revelação de senha padrão do navegador */
+.hide-password-reveal::-ms-reveal,
+.hide-password-reveal::-webkit-password-reveal-button {
+  display: none;
+}
+
+.hide-password-reveal::-webkit-credentials-auto-fill-button {
+  display: none !important;
+}
+
+/* Responsividade personalizada */
+@media (max-width: 480px) {
+  .modal-content {
+    max-width: calc(100vw - 2rem);
+    margin: 1rem;
+  }
+}
+
+/* Melhoria para texto muito longo em telas pequenas */
+.text-responsive {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Scroll suave para modais */
+.modal-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.5);
+  border-radius: 20px;
+  border: transparent;
+}
+
+/* Scrollbar customizado para aulas ao vivo */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thumb-white\/30 {
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.scrollbar-track-transparent {
+  scrollbar-track-color: transparent;
+}
+
+.scrollbar-thumb-gray-300 {
+  scrollbar-color: #d1d5db transparent;
+}
+
+.scrollbar-track-gray-100 {
+  scrollbar-track-color: #f3f4f6;
+}
+
+/* Para WebKit browsers (Chrome, Safari, Edge) */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Classes utilitárias adicionais */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.touch-target {
+  @apply min-h-[44px] min-w-[44px];
+}
+
+/* Sidebar layout helpers */
+:root{
+  --sidebar-open-w: 14rem;    /* matches w-56 */
+  --sidebar-collapsed-w: 4rem; /* matches w-16 */
+}
+
+/* When app has a sidebar, push content to the right */
+.has-sidebar {
+  transition: padding-left .25s ease;
+  padding-left: var(--sidebar-open-w);
+}
+
+/* Collapsed (icons-only) */
+.has-sidebar.sidebar-collapsed {
+  padding-left: var(--sidebar-collapsed-w);
+}
+
+/* On small screens don't add body padding so mobile drawer overlays as expected */
+@media (max-width: 767px) {
+  .has-sidebar,
+  .has-sidebar.sidebar-collapsed {
+    padding-left: 0;
+  }
+}
+
+/* Small tweak so fixed top bars don't get hidden when sidebar exists */
+.header, .topbar, .main-header {
+  z-index: 30; /* lower than sidebar (z-50) so sidebar still overlays header if needed */
+}

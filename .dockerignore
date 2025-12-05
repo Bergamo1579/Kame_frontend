@@ -1,0 +1,15 @@
+# Node modules and build outputs
+node_modules
+build
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Env files (do not include secrets in the image)
+.env

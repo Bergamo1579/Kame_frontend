@@ -1,0 +1,171 @@
+
+    "/api/expense/{id}": {
+      "get": {
+        "description": "Retorna os detalhes de uma despesa específica",
+        "operationId": "ExpenseController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID da despesa",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Despesa encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "expense_id": "uuid",
+                    "description": "Despesa Exemplo",
+                    "value": 100,
+                    "date_expense": "2024-07-01",
+                    "status": "pago",
+                    "means_due_date": "2024-07-10",
+                    "NF": "12345",
+                    "NR": 1,
+                    "type_payment_id": 1,
+                    "account_id": "uuid",
+                    "supplier_id": "uuid",
+                    "os_id": "uuid"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado"
+          },
+          "403": {
+            "description": "Acesso negado"
+          },
+          "404": {
+            "description": "Despesa não encontrada"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Buscar despesa por ID",
+        "tags": [
+          "Despesas"
+        ]
+      },
+      "patch": {
+        "description": "Atualiza os dados de uma despesa existente",
+        "operationId": "ExpenseController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID da despesa",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExpenseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Despesa atualizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "expense_id": "uuid",
+                    "description": "Despesa Atualizada",
+                    "value": 200
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Relacionamento não encontrado"
+          },
+          "401": {
+            "description": "Não autorizado"
+          },
+          "403": {
+            "description": "Acesso negado"
+          },
+          "404": {
+            "description": "Despesa não encontrada"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Atualizar despesa",
+        "tags": [
+          "Despesas"
+        ]
+      },
+      "delete": {
+        "description": "Remove uma despesa do sistema",
+        "operationId": "ExpenseController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID da despesa",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Despesa deletada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Despesa deletada com sucesso"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado"
+          },
+          "403": {
+            "description": "Acesso negado"
+          },
+          "404": {
+            "description": "Despesa não encontrada"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Deletar despesa",
+        "tags": [
+          "Despesas"
+        ]
+      }
+    }
+  }
