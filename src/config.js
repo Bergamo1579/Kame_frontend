@@ -1,1 +1,1 @@
-export const API_BASE_URL = 'http://localhost:3000';
+export const API_BASE_URL = 'https://tgsocwgc4s0c4ck0s8wg4k84.72.60.4.3.sslip.io';
