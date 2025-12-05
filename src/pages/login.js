@@ -72,7 +72,7 @@ export default function Login() {
       if (token) {
         try {
           // Tenta navegar direto se tiver token
-          navigate('/admin/dashboard', { replace: true });
+          navigate('/admin/dashboard/controle-efetivo', { replace: true });
         } catch (error) {
           // Se o token for inválido, limpa e continua no login
           localStorage.removeItem('token');
@@ -101,7 +101,7 @@ export default function Login() {
     try {
       // Chama o login do AuthContext para atualizar o estado global
       await login({ username: username.trim(), password });
-      navigate('/admin/dashboard');
+      navigate('/admin/dashboard/controle-efetivo');
     } catch (err) {
       setError(err.message || 'Credenciais inválidas. Verifique seu usuário e senha.');
     } finally {

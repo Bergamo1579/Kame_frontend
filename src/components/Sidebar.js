@@ -81,9 +81,9 @@ export default function Sidebar() {
         return (
           <li key={path} className="relative">
             <div className={`flex items-center justify-between px-2 py-1 rounded-lg ${subActive ? 'bg-white/5 text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white'}`}>
-              {/* Parent link navigates to currently active dashboard subpage */}
+              {/* Parent link navigates to Controle Efetivo */}
               <Link
-                to={location.pathname.startsWith('/admin/dashboard/') ? location.pathname : '/admin/dashboard'}
+                to="/admin/dashboard/controle-efetivo"
                 onClick={() => onClickClose && onClickClose()}
                 className="flex items-center gap-3"
               >
