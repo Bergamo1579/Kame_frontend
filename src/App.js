@@ -33,8 +33,8 @@ function App() {
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<Navigate to="/admin/dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
+            <Route index element={<Navigate to="/admin/dashboard/controle-efetivo" replace />} />
+            <Route path="dashboard" element={<Navigate to="/admin/dashboard/controle-efetivo" replace />} />
             <Route path="dashboard/controle-efetivo" element={<ControleEfetivo />} />
             <Route path="dashboard/resumo-anual" element={<ResumoAnual />} />
             
